@@ -63,8 +63,6 @@ def open_move_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    return 100
-
     return float(len(game.get_legal_moves(player)))
 
 
@@ -247,16 +245,19 @@ if __name__ == "__main__":
     from isolation import Board
     import game_agent
 
-    agent = MinimaxPlayer(search_depth=1, score_fn=open_move_score)
+    agent = MinimaxPlayer(search_depth=1, score_fn=center_score)
     agent.time_left = lambda: 99
+
+    alphabeta_player = game_agent.AlphaBetaPlayer(search_depth=1, score_fn=open_move_score)
+    alphabeta_player.time_left = lambda : 99
 
     player1 = RandomPlayer()
     player2 = GreedyPlayer()
     game = Board(player1, player2, width=9, height=9)
     game._board_state = \
-        [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0,
-         0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0, 0, 0, 0, 20, 43]
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0,
+         0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 24, 44]
 
     print(game.to_string())
     print (game.active_player)
@@ -267,6 +268,9 @@ if __name__ == "__main__":
     print("Player2 legal moves", game.get_legal_moves(player2))
     best_move = agent.minimax(game, 1)
     print("best move", best_move)
+
+    alphabeta_move = alphabeta_player.alphabeta(game, 2, alpha=6.0, beta=3.0)
+    print ("alphabeta move", alphabeta_move)
 
 
 def isolation_test():

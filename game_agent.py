@@ -100,67 +100,6 @@ def custom_score_3(game, player):
 
     return float(active_player_moves - blank_spaces * opponent_player_moves)
 
-
-def boost_calculation_score(game, player):
-    """Calculate the heuristic value of a game state from the point of view
-    of the given player.
-
-    This should be the best heuristic function for your project submission.
-
-    Note: this function should be called from within a Player instance as
-    `self.score()` -- you should not need to call this function directly.
-
-    Parameters
-    ----------
-    game : `isolation.Board`
-        An instance of `isolation.Board` encoding the current state of the
-        game (e.g., player locations and blocked cells).
-
-    player : object
-        A player instance in the current game (i.e., an object corresponding to
-        one of the player objects `game.__player_1__` or `game.__player_2__`.)
-
-    Returns
-    -------
-    float
-        The heuristic value of the current game state to the specified player.
-    """
-    if game.is_loser(player):
-        return float("-inf")
-    if game.is_winner(player):
-        return float("inf")
-
-    possible_moves = game.get_legal_moves(game.active_player)
-    print("player", game.active_player,
-          "in location", game.get_player_location(game.active_player),
-          "possible_moves", possible_moves)
-    max_width, max_height = game.width, game.height
-    scores = list(map(lambda x: boost_calculator(x, max_width, max_height), possible_moves))
-    score = sum(scores)
-    return float(score)
-
-
-def boost_calculator(location, max_weight, max_height):
-    center_row = int(max_height / 2)
-    center_column = int(max_weight / 2)
-    if location is None:
-        return 0
-    row = location[0]
-    column = location[1]
-    if row is 0 or column is 0 or row is max_height or column is max_weight:
-        return 1
-    if row is 1 or column is 1 or row is max_height - 1 or column is max_weight - 1:
-        return 2
-    if row in (center_row - 1, center_row, center_row + 1) \
-            and column in (center_column - 1, center_column, center_column + 1):
-        return 4
-    return 3
-
-def moves_availability_score(game):
-    print("active player", game.active_player, "inactive player", game.inactive_player)
-    active_player_moves = game.get_legal_moves(game.active_player)
-    return len(active_player_moves)
-
 class IsolationPlayer:
     """Base class for minimax and alphabeta agents -- this class is never
     constructed or tested directly.
@@ -297,10 +236,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         print("actions payoff", moves)
 
-        if depth % 2 == 0:
-            best_action_move = max(moves, key=lambda move: move[1])
-        else:
-            best_action_move = min(moves, key=lambda move: move[1])
+        best_action_move = max(moves, key=lambda move: move[1])
 
         best_action = best_action_move[0]
         print("found best action", best_action)
@@ -317,15 +253,12 @@ class MinimaxPlayer(IsolationPlayer):
         self.timer_check()
         value = float("-inf")
         if self.terminal_check(game):
-            print("returning terminal state value", value, game.get_legal_moves(), "moves")
             return game.utility(game.active_player)
         if depth == 0:
-            print("returning value ", self.score(game, game.active_player), "for player", game.active_player)
             return self.score(game, game.active_player)
         for move in game.get_legal_moves():
             post_game_value = self.__min_value(game.forecast_move(move), depth - 1)
             value = max(value, post_game_value)
-        print("returning max value ", value)
         return value
 
     def __min_value(self, game, depth):
@@ -338,15 +271,12 @@ class MinimaxPlayer(IsolationPlayer):
         self.timer_check()
         value = float("+inf")
         if self.terminal_check(game):
-            return game.utility(game.active_player)
+            return game.utility(game.inactive_player)
         if depth == 0:
-            print("returning value ", self.score(game, game.active_player), "for player", game.active_player)
-            return self.score(game, game.active_player)
+            return self.score(game, game.inactive_player)
         for move in game.get_legal_moves():
             post_game_value = self.__max_value(game.forecast_move(move), depth - 1)
-            print("value", value, "post value", post_game_value)
             value = min(value, post_game_value)
-        print("returning min value ", value)
         return value
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -453,10 +383,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         moves = [(move, self.__min_value(game.forecast_move(move), depth - 1, alpha, beta))
                  for move in game.get_legal_moves()]
 
-        if depth % 2 == 0:
-            best_action_move = max(moves, key=lambda move: move[1])
-        else:
-            best_action_move = min(moves, key=lambda move: move[1])
+        best_action_move = max(moves, key=lambda move: move[1])
 
         best_action = best_action_move[0]
         print("found best action", best_action)
@@ -483,9 +410,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         self.timer_check()
         value = float("+inf")
         if self.terminal_check(game):
-            return game.utility(game.active_player)
+            return game.utility(game.inactive_player)
         if depth == 0:
-            return self.score(game, game.active_player)
+            return self.score(game, game.inactive_player)
         for move in game.get_legal_moves():
             post_game_value = self.__max_value(game.forecast_move(move), depth - 1, alpha, beta)
             value = min(value, post_game_value)
