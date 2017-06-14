@@ -380,13 +380,15 @@ class AlphaBetaPlayer(IsolationPlayer):
         if len(game.get_legal_moves()) is 0:
             return (-1, -1)
 
-        moves = [(move, self.__min_value(game.forecast_move(move), depth - 1, alpha, beta))
-                 for move in game.get_legal_moves()]
+        score = float("-inf")
+        best_action = (-1, -1)
 
-        best_action_move = max(moves, key=lambda move: move[1])
-
-        best_action = best_action_move[0]
-        print("found best action", best_action)
+        for move in game.get_legal_moves():
+            value = self.__min_value(game.forecast_move(move), depth - 1, alpha, beta)
+            alpha = max(alpha, value)
+            if value >= score:
+                score = value
+                best_action = move
 
         return best_action
 
