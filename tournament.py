@@ -132,9 +132,9 @@ def main():
     # starting position against the same adversaries in the tournament
     test_agents = [
         Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved"),
-        Agent(AlphaBetaPlayer(score_fn=custom_score), "AB_Custom"),
-        Agent(AlphaBetaPlayer(score_fn=custom_score_2), "AB_Custom_2"),
-        Agent(AlphaBetaPlayer(score_fn=custom_score_3), "AB_Custom_3")
+        Agent(AlphaBetaPlayer(score_fn=custom_score), "weighted"),
+        Agent(AlphaBetaPlayer(score_fn=custom_score_2), "perc_moves"),
+        Agent(AlphaBetaPlayer(score_fn=custom_score_3), "manhattan")
     ]
 
     # Define a collection of agents to compete against the test agents
@@ -148,11 +148,14 @@ def main():
         Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved")
     ]
 
-    print(DESCRIPTION)
-    print("{:^74}".format("*************************"))
-    print("{:^74}".format("Playing Matches"))
-    print("{:^74}".format("*************************"))
-    play_matches(cpu_agents, test_agents, NUM_MATCHES)
+    for game in range(20):
+        print ("Running experiment #", game)
+        print(DESCRIPTION)
+        print("{:^74}".format("*************************"))
+        print("{:^74}".format("Playing Matches"))
+        print("{:^74}".format("*************************"))
+        play_matches(cpu_agents, test_agents, NUM_MATCHES)
+        print ("Closed Experiment #", game, "\n\n")
 
 
 if __name__ == "__main__":
